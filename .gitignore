@@ -1,0 +1,11 @@
+# Segredo do Google (cada máquina usa o seu — NÃO versionar)
+config/google.php
+
+# Backup local do visual antigo
+_backup_pre_glass/
+
+# Uploads e temporários
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
