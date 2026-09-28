@@ -1,8 +1,8 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireAdmin();
-$clientes = $pdo->query("SELECT u.*, (SELECT COUNT(*) FROM pedidos p WHERE p.usuario_id=u.id) AS pedidos, (SELECT COALESCE(SUM(total),0) FROM pedidos p WHERE p.usuario_id=u.id AND p.status!='cancelado') AS gasto FROM usuarios u WHERE tipo='cliente' ORDER BY id DESC")->fetchAll();
+$clientes = $pdo->query("SELECT u.*, (SELECT COUNT(*) FROM pedidos p WHERE p.usuario_id=u.id) AS pedidos, (SELECT COALESCE(SUM(total),0) FROM pedidos p WHERE p.usuario_id=u.id AND p.status IN ('pago','enviado','entregue')) AS gasto FROM usuarios u WHERE tipo='cliente' ORDER BY id DESC")->fetchAll();
 
 $titulo = 'Gestão de Clientes';
 $menuAtivo = 'clientes';
@@ -22,3 +22,4 @@ include '_layout_top.php';
   </table>
 </div>
 <?php include '_layout_bottom.php'; ?>
+

@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS pedidos (
   status ENUM('pendente','pago','enviado','entregue','cancelado') DEFAULT 'pendente',
   endereco_entrega VARCHAR(255) NOT NULL,
   forma_pagamento VARCHAR(50) NOT NULL DEFAULT 'pix',
+  expira_em DATETIME DEFAULT NULL,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;

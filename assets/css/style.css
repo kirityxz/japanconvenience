@@ -316,6 +316,15 @@ img{display:block;max-width:100%}
     border:1px solid rgba(22,163,74,.2)}
 .pix-box b{font-size:15px}
 
+/* ---------- Pagamento ---------- */
+.pay-timer{margin-left:auto;font-size:15px;font-weight:800;color:var(--red);
+    background:rgba(219,39,50,.09);border-radius:999px;padding:6px 14px;white-space:nowrap}
+.pay-timer.urgent{background:var(--red);color:#fff;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.6}}
+.pix-code{display:flex;gap:8px;align-items:center;background:#fff;
+    border:1px dashed rgba(50,40,35,.25);border-radius:12px;padding:10px 12px}
+.pix-code code{flex:1;font-size:12px;word-break:break-all;color:#333}
+
 /* ---------- Minha conta ---------- */
 .conta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .conta-card{display:grid;grid-template-columns:52px 1fr 16px;gap:12px;align-items:center;

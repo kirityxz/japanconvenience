@@ -2,9 +2,11 @@
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 requireLogin();
+expirarPedidos($pdo);
 $stmt = $pdo->prepare("SELECT * FROM pedidos WHERE usuario_id=? ORDER BY id DESC");
 $stmt->execute([$_SESSION['usuario_id']]);
 $pedidos = $stmt->fetchAll();
+$pill = ['pendente' => 'warning', 'pago' => 'success', 'enviado' => 'info', 'entregue' => 'primary', 'cancelado' => 'danger'];
 include 'includes/header.php';
 ?>
 <div class="container">
@@ -12,9 +14,9 @@ include 'includes/header.php';
   <?php if (!$pedidos): ?><div class="alert alert-info">Você ainda não fez pedidos. <a href="index.php">Ver produtos</a></div><?php endif; ?>
   <?php foreach ($pedidos as $ped): ?>
   <div class="card mb-3">
-    <div class="card-header d-flex justify-content-between">
+    <div class="card-header d-flex justify-content-between align-items-center">
       <b>Pedido #<?= $ped['id'] ?></b>
-      <span class="badge bg-<?= $ped['status']==='cancelado'?'danger':'success' ?>"><?= e($ped['status']) ?></span>
+      <span class="badge bg-<?= $pill[$ped['status']] ?? 'secondary' ?>"><?= $ped['status'] === 'pendente' ? 'Aguardando pagamento' : e(ucfirst($ped['status'])) ?></span>
     </div>
     <div class="card-body">
       <?php
@@ -25,7 +27,12 @@ include 'includes/header.php';
         <li><?= e($r['imagem']) ?> <?= e($r['nome']) ?> x<?= $r['quantidade'] ?> — <?= precoBR($r['preco_unit']*$r['quantidade']) ?></li>
       <?php endforeach; ?></ul>
       <small class="text-muted"><?= e($ped['endereco_entrega']) ?> · <?= e($ped['forma_pagamento']) ?> · <?= $ped['criado_em'] ?></small>
-      <p class="mt-2 mb-0">Total: <b class="price"><?= precoBR($ped['total']) ?></b></p>
+      <p class="mt-2 mb-2">Total: <b class="price"><?= precoBR($ped['total']) ?></b></p>
+      <?php if ($ped['status'] === 'pendente'): ?>
+        <a href="pagamento.php?id=<?= $ped['id'] ?>" class="btn btn-sm btn-danger">Pagar agora (30 min para expirar)</a>
+      <?php elseif ($ped['status'] === 'cancelado'): ?>
+        <small class="text-muted">Pedido cancelado — pagamento não efetuado no prazo.</small>
+      <?php endif; ?>
     </div>
   </div>
   <?php endforeach; ?>

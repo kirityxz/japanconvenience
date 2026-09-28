@@ -1,4 +1,6 @@
 <?php
+// Fuso da loja (evita divergência com o horário do MySQL)
+date_default_timezone_set('America/Sao_Paulo');
 session_start();
 
 function isLogged() { return isset($_SESSION['usuario_id']); }
@@ -29,6 +31,35 @@ function pixTaxa() {
 }
 function pctPix() { return (int)round(pixTaxa() * 100); }
 function precoPix($v) { return (float)$v * (1 - pixTaxa()); }
+
+// Devolve o estoque reservado de um pedido pendente e o cancela
+function cancelarPedido($pdo, $id) {
+    try {
+        $pdo->beginTransaction();
+        $st = $pdo->prepare("SELECT status FROM pedidos WHERE id = ? FOR UPDATE");
+        $st->execute([$id]);
+        if ($st->fetchColumn() !== 'pendente') { $pdo->rollBack(); return false; }
+        $it = $pdo->prepare("SELECT produto_id, quantidade FROM pedido_itens WHERE pedido_id = ?");
+        $it->execute([$id]);
+        $up = $pdo->prepare("UPDATE produtos SET estoque = estoque + ? WHERE id = ?");
+        foreach ($it->fetchAll() as $r) $up->execute([$r['quantidade'], $r['produto_id']]);
+        $pdo->prepare("UPDATE pedidos SET status = 'cancelado' WHERE id = ?")->execute([$id]);
+        $pdo->commit();
+        return true;
+    } catch (Exception $e) {
+        try { $pdo->rollBack(); } catch (Exception $x) {}
+        return false;
+    }
+}
+
+// Cancela pedidos pendentes com o prazo de 30 min estourado (chamado a cada acesso à loja)
+function expirarPedidos($pdo = null) {
+    if (!$pdo) return;
+    try {
+        $ids = $pdo->query("SELECT id FROM pedidos WHERE status = 'pendente' AND expira_em IS NOT NULL AND expira_em < NOW()")->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($ids as $pid) cancelarPedido($pdo, (int)$pid);
+    } catch (Exception $e) {}
+}
 
 // E-mail válido de verdade: formato rígido + domínio existente (anti e-mail falso)
 function emailValido($email) {

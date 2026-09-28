@@ -1,15 +1,15 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireAdmin();
 
 // ---------- KPIs (dados reais) ----------
-$fatHoje  = (float)$pdo->query("SELECT COALESCE(SUM(total),0) FROM pedidos WHERE DATE(criado_em)=CURDATE() AND status!='cancelado'")->fetchColumn();
-$fatOntem = (float)$pdo->query("SELECT COALESCE(SUM(total),0) FROM pedidos WHERE DATE(criado_em)=CURDATE()-INTERVAL 1 DAY AND status!='cancelado'")->fetchColumn();
+$fatHoje  = (float)$pdo->query("SELECT COALESCE(SUM(total),0) FROM pedidos WHERE DATE(criado_em)=CURDATE() AND status IN ('pago','enviado','entregue')")->fetchColumn();
+$fatOntem = (float)$pdo->query("SELECT COALESCE(SUM(total),0) FROM pedidos WHERE DATE(criado_em)=CURDATE()-INTERVAL 1 DAY AND status IN ('pago','enviado','entregue')")->fetchColumn();
 $pedHoje  = (int)$pdo->query("SELECT COUNT(*) FROM pedidos WHERE DATE(criado_em)=CURDATE()")->fetchColumn();
 $mediaSem = (float)$pdo->query("SELECT COUNT(*)/7 FROM pedidos WHERE criado_em >= CURDATE()-INTERVAL 7 DAY")->fetchColumn();
 $ticket   = (float)$pdo->query("SELECT COALESCE(AVG(total),0) FROM pedidos WHERE status!='cancelado'")->fetchColumn();
-$ticketOntem = (float)$pdo->query("SELECT COALESCE(AVG(total),0) FROM pedidos WHERE DATE(criado_em)=CURDATE()-INTERVAL 1 DAY AND status!='cancelado'")->fetchColumn();
+$ticketOntem = (float)$pdo->query("SELECT COALESCE(AVG(total),0) FROM pedidos WHERE DATE(criado_em)=CURDATE()-INTERVAL 1 DAY AND status IN ('pago','enviado','entregue')")->fetchColumn();
 $criticos = $pdo->query("SELECT * FROM produtos WHERE estoque <= 10 AND ativo=1 ORDER BY estoque LIMIT 5")->fetchAll();
 $nCriticos = (int)$pdo->query("SELECT COUNT(*) FROM produtos WHERE estoque <= 10 AND ativo=1")->fetchColumn();
 $recentes = $pdo->query("SELECT pe.id, pe.total, pe.status, u.nome FROM pedidos pe JOIN usuarios u ON u.id=pe.usuario_id ORDER BY pe.id DESC LIMIT 4")->fetchAll();
@@ -24,7 +24,7 @@ function delta($atual, $base, $sufixo) {
 
 // ---------- Grafico: vendas por mes no ano atual ----------
 $ano = date('Y');
-$stmt = $pdo->prepare("SELECT MONTH(criado_em) m, COALESCE(SUM(total),0) t FROM pedidos WHERE YEAR(criado_em)=? AND status!='cancelado' GROUP BY m");
+$stmt = $pdo->prepare("SELECT MONTH(criado_em) m, COALESCE(SUM(total),0) t FROM pedidos WHERE YEAR(criado_em)=? AND status IN ('pago','enviado','entregue') GROUP BY m");
 $stmt->execute([$ano]);
 $porMes = array_fill(1, 12, 0);
 foreach ($stmt->fetchAll() as $r) $porMes[(int)$r['m']] = (float)$r['t'];
@@ -95,3 +95,4 @@ new Chart(document.getElementById('grafVendas'), {
 });
 </script>
 <?php include '_layout_bottom.php'; ?>
+

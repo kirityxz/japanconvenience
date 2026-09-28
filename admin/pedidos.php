@@ -3,8 +3,15 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 requireAdmin();
 if (isset($_GET['status'], $_GET['id'])) {
-    $pdo->prepare("UPDATE pedidos SET status=? WHERE id=?")->execute([$_GET['status'], (int)$_GET['id']]);
-    $_SESSION['sucesso'] = 'Status atualizado!';
+    $novo = $_GET['status'];
+    $id = (int)$_GET['id'];
+    if ($novo === 'cancelado') {
+        if (cancelarPedido($pdo, $id)) $_SESSION['sucesso'] = 'Pedido cancelado e estoque devolvido!';
+        else $_SESSION['erro'] = 'Só pedidos pendentes podem ser cancelados com estorno.';
+    } else {
+        $pdo->prepare("UPDATE pedidos SET status=? WHERE id=?")->execute([$novo, $id]);
+        $_SESSION['sucesso'] = 'Status atualizado!';
+    }
     header('Location: pedidos.php'); exit;
 }
 $pedidos = $pdo->query("SELECT pe.*, u.nome, u.email FROM pedidos pe JOIN usuarios u ON u.id=pe.usuario_id ORDER BY pe.id DESC")->fetchAll();
@@ -23,7 +30,7 @@ include '_layout_top.php';
   </div>
   <?php $it = $pdo->prepare("SELECT i.*, p.nome FROM pedido_itens i JOIN produtos p ON p.id=i.produto_id WHERE i.pedido_id=?"); $it->execute([$ped['id']]); ?>
   <ul class="small my-2"><?php foreach ($it->fetchAll() as $r): ?><li><?= e($r['nome']) ?> x<?= $r['quantidade'] ?> — <?= precoBR($r['preco_unit'] * $r['quantidade']) ?></li><?php endforeach; ?></ul>
-  <p class="small mb-2">Total: <b><?= precoBR($ped['total']) ?></b> · <?= e($ped['endereco_entrega']) ?> · <?= e($ped['forma_pagamento']) ?> · <?= $ped['criado_em'] ?></p>
+  <p class="small mb-2">Total: <b><?= precoBR($ped['total']) ?></b> · <?= e($ped['endereco_entrega']) ?> · <?= e($ped['forma_pagamento']) ?> · <?= $ped['criado_em'] ?><?php if ($ped['status'] === 'pendente' && !empty($ped['expira_em'])): ?> · <span class="text-danger">expira em <?= $ped['expira_em'] ?></span><?php endif; ?></p>
   <div class="btn-group btn-group-sm">
     <a href="pedidos.php?id=<?= $ped['id'] ?>&status=pago" class="btn btn-outline-success">Pago</a>
     <a href="pedidos.php?id=<?= $ped['id'] ?>&status=enviado" class="btn btn-outline-primary">Enviado</a>

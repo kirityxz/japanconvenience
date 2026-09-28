@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $endereco = "$rua, Nº $numero - $bairro, $cidade/$uf - CEP $cepFmt";
     try {
         $pdo->beginTransaction();
-        $stmt = $pdo->prepare("INSERT INTO pedidos (usuario_id, total, endereco_entrega, forma_pagamento) VALUES (?,?,?,?)");
+        $stmt = $pdo->prepare("INSERT INTO pedidos (usuario_id, total, endereco_entrega, forma_pagamento, status, expira_em) VALUES (?,?,?,?,'pendente', DATE_ADD(NOW(), INTERVAL 30 MINUTE))");
         $stmt->execute([$_SESSION['usuario_id'], $total, $endereco, $pagValidos[$pag]]);
         $pedidoId = $pdo->lastInsertId();
         foreach ($prods as $p) {
@@ -72,8 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $pdo->commit();
         $_SESSION['carrinho'] = [];
-        $_SESSION['sucesso'] = "Pedido #$pedidoId pago com sucesso. Obrigado pela compra.";
-        header('Location: meus-pedidos.php'); exit;
+        $_SESSION['sucesso'] = "Pedido #$pedidoId criado! Efetue o pagamento em até 30 min.";
+        header("Location: pagamento.php?id=$pedidoId"); exit;
     } catch (Exception $e) {
         $pdo->rollBack();
         $_SESSION['erro'] = 'Erro ao finalizar: ' . $e->getMessage();
