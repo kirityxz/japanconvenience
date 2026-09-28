@@ -14,7 +14,7 @@ function menuClass($m, $atual) { return $m === $atual ? 'adm-menu-item active' :
 <title><?= e($titulo ?? 'Admin') ?> — JapanConvenience</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="/JapanConvenience/assets/css/style.css?v=20">
+<link rel="stylesheet" href="/JapanConvenience/assets/css/style.css?v=21">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body class="adm-body">
@@ -51,6 +51,7 @@ function menuClass($m, $atual) { return $m === $atual ? 'adm-menu-item active' :
     <div class="adm-content">
       <?php if ($m = flash('sucesso')): ?><div class="alert alert-success"><?= e($m) ?></div><?php endif; ?>
       <?php if ($m = flash('erro')): ?><div class="alert alert-danger"><?= e($m) ?></div><?php endif; ?>
+
 
 
 

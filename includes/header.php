@@ -32,7 +32,7 @@ if ($__cartCount > 0 && isset($pdo) && !empty($_SESSION['carrinho'])) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="/JapanConvenience/assets/css/style.css?v=20">
+<link rel="stylesheet" href="/JapanConvenience/assets/css/style.css?v=21">
 </head>
 <body>
 <header class="site-header glass">
@@ -52,11 +52,11 @@ if ($__cartCount > 0 && isset($pdo) && !empty($_SESSION['carrinho'])) {
 
     <div class="header-actions">
       <?php if (isLogged()): ?>
-        <a class="account action-pill text-decoration-none" href="/JapanConvenience/meus-pedidos.php" style="color:inherit">
+        <span class="account action-pill">
           <span class="icon-circle">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </span>
-          <span class="action-copy"><b>Olá, <?= e(explode(' ', $_SESSION['usuario_nome'])[0]) ?></b><small>Meus pedidos · <span style="text-decoration:underline">Sair</span></small></span>
+          <span class="action-copy"><b>Olá, <?= e(explode(' ', $_SESSION['usuario_nome'])[0]) ?></b><small><a href="/JapanConvenience/conta.php">Minha conta</a> · <a href="/JapanConvenience/logout.php">Sair</a></small></span>
         </a>
       <?php else: ?>
         <a class="account action-pill text-decoration-none" href="/JapanConvenience/login.php" style="color:inherit">
@@ -141,6 +141,7 @@ if ($__cartCount > 0 && isset($pdo) && !empty($_SESSION['carrinho'])) {
 <?php if ($er = flash('erro')): ?><div class="alert alert-danger"><?= e($er) ?></div><?php endif; ?>
 </div>
 <main>
+
 
 
 

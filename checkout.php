@@ -81,6 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 include 'includes/header.php';
+$endSalvo = null;
+try {
+    $st = $pdo->prepare("SELECT cep, rua, numero, bairro, cidade, uf FROM usuarios WHERE id = ?");
+    $st->execute([$_SESSION['usuario_id']]);
+    $r = $st->fetch();
+    if ($r && !empty($r['rua'])) $endSalvo = $r;
+} catch (Exception $e) {}
 ?>
 <div class="container">
   <h4 class="mb-4">Finalizar compra</h4>
@@ -89,7 +96,17 @@ include 'includes/header.php';
       <!-- ESQUERDA -->
       <div class="col-lg-7">
         <div class="adm-card mb-3">
-          <h6>Endereço de entrega</h6>
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h6 class="mb-0">Endereço de entrega</h6>
+            <?php if ($endSalvo): ?>
+              <button type="button" class="btn btn-sm btn-outline-danger" id="btn-end-salvo"
+                data-cep="<?= e($endSalvo['cep']) ?>" data-rua="<?= e($endSalvo['rua']) ?>"
+                data-numero="<?= e($endSalvo['numero']) ?>" data-bairro="<?= e($endSalvo['bairro']) ?>"
+                data-cidade="<?= e($endSalvo['cidade']) ?>" data-uf="<?= e($endSalvo['uf']) ?>">
+                Usar meu endereço
+              </button>
+            <?php endif; ?>
+          </div>
           <div class="row g-2 mt-1">
             <div class="col-md-6"><label class="small text-muted">CEP (só números)</label>
               <input name="cep" id="cep" class="form-control" placeholder="01505-001" required inputmode="numeric" maxlength="9"></div>
@@ -160,6 +177,21 @@ include 'includes/header.php';
   </form>
 </div>
 <script>
+// Preenche com o endereço salvo na conta
+document.getElementById('btn-end-salvo')?.addEventListener('click', e => {
+  const b = e.currentTarget;
+  const set = (id, v) => { const el = document.getElementById(id); if (el && v) { el.value = v; el.dispatchEvent(new Event('input')); } };
+  set('cep', b.dataset.cep);
+  set('bairro', b.dataset.bairro);
+  set('rua', b.dataset.rua);
+  set('numero', b.dataset.numero);
+  const uf = b.dataset.uf, est = document.getElementById('estado');
+  if (uf && est) est.value = uf;
+  if (b.dataset.cidade) {
+    document.getElementById('cidade-wrap').innerHTML =
+      '<input name="cidade" class="form-control" required value="' + b.dataset.cidade.replace(/"/g, '&quot;') + '">';
+  }
+});
 // CEP: so numeros, maximo 8, formata 00000-000
 document.getElementById('cep').addEventListener('input', e => {
   let d = e.target.value.replace(/\D/g, '').slice(0, 8);

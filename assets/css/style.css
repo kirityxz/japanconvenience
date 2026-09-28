@@ -316,6 +316,18 @@ img{display:block;max-width:100%}
     border:1px solid rgba(22,163,74,.2)}
 .pix-box b{font-size:15px}
 
+/* ---------- Minha conta ---------- */
+.conta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.conta-card{display:grid;grid-template-columns:52px 1fr 16px;gap:12px;align-items:center;
+    border-radius:16px;padding:20px 16px;text-decoration:none;color:inherit;transition:.2s}
+.conta-card:hover{transform:translateY(-3px);box-shadow:0 18px 34px rgba(35,25,18,.12);color:inherit}
+.conta-ico{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;
+    color:var(--red);background:rgba(219,39,50,.09)}
+.conta-card b{display:block;font-size:14px}
+.conta-card small{font-size:11px;color:#858282}
+@media (max-width:900px){.conta-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.conta-grid{grid-template-columns:1fr}}
+
 /* ---------- Galeria de fotos ---------- */
 .galeria{position:relative}
 .gal-btn{position:absolute;top:50%;transform:translateY(-50%);width:26px;height:26px;
