@@ -29,4 +29,4 @@ admin/index, produtos, categorias, pedidos, clientes • database.sql • docs/
 ## 📄 Documentação
 - `docs/Documento-Requisitos.md` • `docs/Design-Telas.md` • `docs/Banco-de-Dados.md` (com DER p/ Lucidchart)
 
-Feito para apresentação escolar. Arigatou! 🇯🇵
+Feito para apresentação do curso. Arigatou! 🇯🇵
